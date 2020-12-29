@@ -31,7 +31,6 @@ class MeanSquaredError(tf.keras.losses.MeanSquaredError):
     Use mean squared error for regression problems with one or more outputs.
     """
 
-    @tf.function
     def residuals(self, y_true, y_pred):
         return y_true - y_pred
 
@@ -54,12 +53,10 @@ class ReducedOutputsMeanSquaredError(tf.keras.losses.Loss):
             reduction=reduction,
             name=name)
 
-    @tf.function
     def call(self, y_true, y_pred):
         sq_diff = tf.math.squared_difference(y_true, y_pred)
         return tf.math.reduce_mean(sq_diff, axis=1)
 
-    @tf.function
     def residuals(self, y_true, y_pred):
         sq_diff = tf.math.squared_difference(y_true, y_pred)
         eps = tf.keras.backend.epsilon()
@@ -82,7 +79,6 @@ class CategoricalCrossentropy(tf.keras.losses.CategoricalCrossentropy):
     representation.
     """
 
-    @tf.function
     def residuals(self, y_true, y_pred):
         eps = tf.keras.backend.epsilon()
         return tf.math.sqrt(eps + self.fn(y_true, y_pred, **self._fn_kwargs))
@@ -96,7 +92,6 @@ class SparseCategoricalCrossentropy(
     label classes. The labels are expected to be provided as integers.
     """
 
-    @tf.function
     def residuals(self, y_true, y_pred):
         eps = tf.keras.backend.epsilon()
         return tf.math.sqrt(eps + self.fn(y_true, y_pred, **self._fn_kwargs))
@@ -110,7 +105,6 @@ class BinaryCrossentropy(tf.keras.losses.BinaryCrossentropy):
     floating-point value per prediction.
     """
 
-    @tf.function
     def residuals(self, y_true, y_pred):
         eps = tf.keras.backend.epsilon()
         return tf.math.sqrt(eps + self.fn(y_true, y_pred, **self._fn_kwargs))
@@ -140,7 +134,6 @@ class SquaredCategoricalCrossentropy(tf.keras.losses.Loss):
         self.from_logits = from_logits
         self.label_smoothing = label_smoothing
 
-    @tf.function
     def call(self, y_true, y_pred):
         return tf.math.square(tf.keras.losses.categorical_crossentropy(
             y_true,
@@ -148,7 +141,6 @@ class SquaredCategoricalCrossentropy(tf.keras.losses.Loss):
             self.from_logits,
             self.label_smoothing))
 
-    @tf.function
     def residuals(self, y_true, y_pred):
         return tf.keras.losses.categorical_crossentropy(
             y_true,
@@ -178,13 +170,11 @@ class CategoricalMeanSquaredError(tf.keras.losses.Loss):
             reduction=reduction,
             name=name)
 
-    @tf.function
     def call(self, y_true, y_pred):
         # Selects the y_pred which corresponds to y_true equal to 1.
         prediction = tf.reduce_sum(tf.math.multiply(y_true, y_pred), axis=1)
         return tf.math.squared_difference(1.0, prediction)
 
-    @tf.function
     def residuals(self, y_true, y_pred):
         # Selects the y_pred which corresponds to y_true equal to 1.
         prediction = tf.reduce_sum(tf.math.multiply(y_true, y_pred), axis=1)
@@ -234,27 +224,22 @@ class DampingAlgorithm:
         self.max_value = max_value
         self.fletcher = fletcher
 
-    @tf.function
     def init_step(self, damping_factor, loss):
         return damping_factor
 
-    @tf.function
     def decrease(self, damping_factor, loss):
         return tf.math.maximum(
             damping_factor * self.dec_factor,
             self.min_value)
 
-    @tf.function
     def increase(self, damping_factor, loss):
         return tf.math.minimum(
             damping_factor * self.inc_factor,
             self.max_value)
 
-    @tf.function
     def stop_training(self, damping_factor, loss):
         return damping_factor >= self.max_value
 
-    @tf.function
     def apply(self, damping_factor, JJ):
         if self.fletcher:
             damping = tf.linalg.tensor_diag(tf.linalg.diag_part(JJ))
@@ -385,7 +370,6 @@ class Trainer:
         self._num_variables = tf.reduce_sum(self._splits).numpy().item()
         self._num_outputs = None
 
-    @tf.function
     def _compute_jacobian(self, inputs, targets):
         with tf.GradientTape(persistent=True) as tape:
             outputs = self.model(inputs, training=True)
@@ -405,7 +389,6 @@ class Trainer:
 
         return jacobian, residuals, outputs
 
-    @tf.function
     def _init_gauss_newton_overdetermined(self, inputs, targets):
         # Perform the following computation:
         # J, residuals, outputs = self._compute_jacobian(inputs, targets)
@@ -463,19 +446,16 @@ class Trainer:
 
         return 0.0, JJ, rhs, outputs
 
-    @tf.function
     def _init_gauss_newton_underdetermined(self, inputs, targets):
         J, residuals, outputs = self._compute_jacobian(inputs, targets)
         JJ = tf.linalg.matmul(J, J, transpose_b=True)
         rhs = residuals
         return J, JJ, rhs, outputs
 
-    @tf.function
     def _compute_gauss_newton_overdetermined(self, J, JJ, rhs):
         updates = self.solve_function(JJ, rhs)
         return updates
 
-    @tf.function
     def _compute_gauss_newton_underdetermined(self, J, JJ, rhs):
         updates = self.solve_function(JJ, rhs)
         updates = tf.linalg.matmul(J, updates, transpose_a=True)
@@ -558,7 +538,6 @@ class Trainer:
         self.damping_factor.assign(damping_factor)
         return loss, outputs, attempt, stop_training
 
-    @tf.function
     def _compute_num_outputs(self, inputs, targets):
         input_shape = inputs.shape[1::]
         target_shape = targets.shape[1::]
@@ -570,17 +549,14 @@ class Trainer:
         residuals = self.loss.residuals(_targets, outputs)
         return tf.reduce_prod(residuals.shape[1::])
 
-    @tf.function
     def reset_damping_factor(self):
         self.damping_factor.assign(self.damping_algorithm.starting_value)
 
-    @tf.function
     def backup_variables(self):
         zip_args = (self.model.trainable_variables, self._backup_variables)
         for variable, backup in zip(*zip_args):
             backup.assign(variable)
 
-    @tf.function
     def restore_variables(self):
         zip_args = (self.model.trainable_variables, self._backup_variables)
         for variable, backup in zip(*zip_args):
