@@ -20,6 +20,7 @@
 # ==============================================================================
 
 import tensorflow as tf
+from tensorflow.python.keras.engine import data_adapter
 
 # ==============================================================================
 
@@ -651,7 +652,11 @@ class Trainer:
 
                 pl.on_train_batch_begin(step)
 
-                inputs, targets = next(iterator)
+                data = next(iterator)
+
+                data = data_adapter.expand_1d(data)
+                inputs, targets, sample_weight = \
+                    data_adapter.unpack_x_y_sample_weight(data)
 
                 loss, outputs, attempts, stop_training = \
                     self.train_step(inputs, targets)
@@ -728,7 +733,9 @@ class ModelWrapper(tf.keras.Sequential):
         self.stop_training = value.numpy().item()
 
     def train_step(self, data):
-        inputs, targets = data
+        data = data_adapter.expand_1d(data)
+        inputs, targets, sample_weight = \
+            data_adapter.unpack_x_y_sample_weight(data)
 
         loss, outputs, attempts, stop_training = \
             self.trainer.train_step(inputs, targets)
