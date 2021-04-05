@@ -370,6 +370,7 @@ class Trainer:
         self._num_variables = tf.reduce_sum(self._splits).numpy().item()
         self._num_outputs = None
 
+    @tf.function
     def _compute_jacobian(self, inputs, targets):
         with tf.GradientTape(persistent=True) as tape:
             outputs = self.model(inputs, training=True)
@@ -461,7 +462,6 @@ class Trainer:
         updates = tf.linalg.matmul(J, updates, transpose_a=True)
         return updates
 
-    @tf.function
     def _train_step(self, inputs, targets,
                     init_gauss_newton, compute_gauss_newton):
         # J: jacobian matrix not used in the overdetermined case.
@@ -562,7 +562,6 @@ class Trainer:
         for variable, backup in zip(*zip_args):
             variable.assign(backup)
 
-    @tf.function
     def train_step(self, inputs, targets):
         if self._num_outputs is None:
             self._num_outputs = self._compute_num_outputs(inputs, targets)
@@ -685,7 +684,6 @@ class ModelWrapper(tf.keras.Sequential):
                 metrics=None,
                 loss_weights=None,
                 weighted_metrics=None,
-                run_eagerly=None,
                 **kwargs):
         super(ModelWrapper, self).compile(
             optimizer=optimizer,
@@ -693,7 +691,7 @@ class ModelWrapper(tf.keras.Sequential):
             metrics=metrics,
             loss_weights=loss_weights,
             weighted_metrics=weighted_metrics,
-            run_eagerly=run_eagerly)
+            run_eagerly=True)
 
         self.trainer = Trainer(
             model=self.model,
@@ -704,9 +702,6 @@ class ModelWrapper(tf.keras.Sequential):
             solve_method=solve_method,
             jacobian_max_num_rows=jacobian_max_num_rows,
             experimental_use_pfor=experimental_use_pfor)
-
-    def _assign_stop_training(self, value):
-        self.stop_training = value.numpy().item()
 
     def train_step(self, data):
         data = data_adapter.expand_1d(data)
@@ -726,7 +721,7 @@ class ModelWrapper(tf.keras.Sequential):
         # BUG: In tensorflow v2.2.0 and v2.3.0 setting model.stop_training=True
         # does not stop training immediately, but only at the end of the epoch.
         # https://github.com/tensorflow/tensorflow/issues/41174
-        tf.py_function(self._assign_stop_training, [stop_training], Tout=[])
+        self.stop_training = stop_training
 
         return logs
 
