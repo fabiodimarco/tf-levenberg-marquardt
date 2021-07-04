@@ -412,7 +412,8 @@ class Trainer:
             [self._num_variables, 1],
             dtype=self.model.dtype)
 
-        outputs_array = tf.TensorArray(tf.float32, size=0, dynamic_size=True)
+        outputs_array = tf.TensorArray(
+            self.model.dtype, size=0, dynamic_size=True)
 
         for i in tf.range(num_slices):
             tf.autograph.experimental.set_loop_options(
