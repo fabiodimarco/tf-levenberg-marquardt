@@ -742,7 +742,7 @@ class ModelWrapper(tf.keras.Sequential):
                 count_mode='steps',
                 stateful_metrics=["damping_factor", "attempts"]))
 
-        super(ModelWrapper, self).fit(
+        return super(ModelWrapper, self).fit(
             x=x,
             y=y,
             batch_size=batch_size,
