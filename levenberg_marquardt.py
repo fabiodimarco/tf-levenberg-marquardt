@@ -32,6 +32,8 @@ class MeanSquaredError(tf.keras.losses.MeanSquaredError):
     """
 
     def residuals(self, y_true, y_pred):
+        y_pred = tf.convert_to_tensor(y_pred)
+        y_true = tf.cast(y_true, y_pred.dtype)
         return y_true - y_pred
 
 
@@ -54,10 +56,14 @@ class ReducedOutputsMeanSquaredError(tf.keras.losses.Loss):
             name=name)
 
     def call(self, y_true, y_pred):
+        y_pred = tf.convert_to_tensor(y_pred)
+        y_true = tf.cast(y_true, y_pred.dtype)
         sq_diff = tf.math.squared_difference(y_true, y_pred)
         return tf.math.reduce_mean(sq_diff, axis=1)
 
     def residuals(self, y_true, y_pred):
+        y_pred = tf.convert_to_tensor(y_pred)
+        y_true = tf.cast(y_true, y_pred.dtype)
         sq_diff = tf.math.squared_difference(y_true, y_pred)
         eps = tf.keras.backend.epsilon()
         return tf.math.sqrt(eps + tf.math.reduce_mean(sq_diff, axis=1))
@@ -171,11 +177,15 @@ class CategoricalMeanSquaredError(tf.keras.losses.Loss):
             name=name)
 
     def call(self, y_true, y_pred):
+        y_pred = tf.convert_to_tensor(y_pred)
+        y_true = tf.cast(y_true, y_pred.dtype)
         # Selects the y_pred which corresponds to y_true equal to 1.
         prediction = tf.reduce_sum(tf.math.multiply(y_true, y_pred), axis=1)
         return tf.math.squared_difference(1.0, prediction)
 
     def residuals(self, y_true, y_pred):
+        y_pred = tf.convert_to_tensor(y_pred)
+        y_true = tf.cast(y_true, y_pred.dtype)
         # Selects the y_pred which corresponds to y_true equal to 1.
         prediction = tf.reduce_sum(tf.math.multiply(y_true, y_pred), axis=1)
         return 1.0 - prediction
