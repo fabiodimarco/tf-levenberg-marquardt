@@ -389,7 +389,8 @@ class Trainer:
         jacobians = tape.jacobian(
             residuals,
             self.model.trainable_variables,
-            experimental_use_pfor=self.experimental_use_pfor)
+            experimental_use_pfor=self.experimental_use_pfor,
+            unconnected_gradients=tf.UnconnectedGradients.ZERO)
 
         del tape
 
