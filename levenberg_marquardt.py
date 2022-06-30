@@ -207,6 +207,7 @@ class DampingAlgorithm:
                  inc_factor=10.0,
                  min_value=1e-10,
                  max_value=1e+10,
+                 adaptive_scaling=False,
                  fletcher=False):
         """Initializes `DampingAlgorithm` instance.
 
@@ -222,6 +223,8 @@ class DampingAlgorithm:
             linear system, at the cost of slower convergence.
           max_value: (Optional) Used as an upper bound for the damping_factor,
             and as condition to stop the Training process.
+          adaptive_scaling: Bool (Optional) Scales the damping_factor adaptively
+            multiplying it with max(diagonal(JJ)).
           fletcher: Bool (Optional) Replace the identity matrix with
             diagonal of the gauss-newton hessian approximation, so that there is
             larger movement along the directions where the gradient is smaller.
@@ -232,6 +235,7 @@ class DampingAlgorithm:
         self.inc_factor = inc_factor
         self.min_value = min_value
         self.max_value = max_value
+        self.adaptive_scaling = adaptive_scaling
         self.fletcher = fletcher
 
     def init_step(self, damping_factor, loss):
@@ -256,7 +260,11 @@ class DampingAlgorithm:
         else:
             damping = tf.eye(tf.shape(JJ)[0], dtype=JJ.dtype)
 
-        damping = tf.scalar_mul(damping_factor, damping)
+        scaler = 1.0
+        if self.adaptive_scaling:
+            scaler = tf.math.reduce_max(tf.linalg.diag_part(JJ))
+
+        damping = tf.scalar_mul(scaler * damping_factor, damping)
         return tf.add(JJ, damping)
 
 
