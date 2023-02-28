@@ -20,7 +20,7 @@
 # ==============================================================================
 
 import tensorflow as tf
-from tensorflow.python.keras.engine import data_adapter
+from keras.engine import data_adapter
 
 # ==============================================================================
 
@@ -732,19 +732,24 @@ class ModelWrapper(tf.keras.Sequential):
             experimental_use_pfor=experimental_use_pfor)
 
     def train_step(self, data):
-        data = data_adapter.expand_1d(data)
-        inputs, targets, sample_weight = \
+        x, y, sample_weight = \
             data_adapter.unpack_x_y_sample_weight(data)
 
-        loss, outputs, attempts, stop_training = \
-            self.trainer.train_step(inputs, targets)
-
-        self.compiled_metrics.update_state(targets, outputs)
-
+        loss, y_pred, attempts, stop_training = \
+            self.trainer.train_step(x, y)
+        
         logs = {"damping_factor": self.trainer.damping_factor,
                 "attempts": attempts,
                 "loss": loss}
-        logs.update({m.name: m.result() for m in self.metrics})
+
+        self.compiled_metrics.update_state(y, y_pred)
+        self._validate_target_and_loss(y, loss)
+        metrics = self.compute_metrics(x, y, y_pred, sample_weight)
+        
+        if 'loss' in metrics:
+            del metrics['loss']
+
+        logs.update(metrics)
 
         # BUG: In tensorflow v2.2.0 and v2.3.0 setting model.stop_training=True
         # does not stop training immediately, but only at the end of the epoch.
