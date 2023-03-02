@@ -21,6 +21,7 @@
 
 import tensorflow as tf
 from keras.engine import data_adapter
+from keras.engine import compile_utils
 
 # ==============================================================================
 
@@ -392,6 +393,7 @@ class Trainer:
     def _compute_jacobian(self, inputs, targets):
         with tf.GradientTape(persistent=True) as tape:
             outputs = self.model(inputs, training=True)
+            targets, outputs, _ = compile_utils.match_dtype_and_rank(targets, outputs, None)
             residuals = self.loss.residuals(targets, outputs)
 
         jacobians = tape.jacobian(
@@ -402,7 +404,7 @@ class Trainer:
 
         del tape
 
-        num_residuals = tf.reduce_prod(tf.shape(residuals))
+        num_residuals = tf.size(residuals)
         jacobians = [tf.reshape(j, (num_residuals, -1)) for j in jacobians]
         jacobian = tf.concat(jacobians, axis=1)
         residuals = tf.reshape(residuals, (num_residuals, -1))
@@ -574,6 +576,7 @@ class Trainer:
         _targets = tf.keras.Input(shape=target_shape,
                                   dtype=targets.dtype)
         outputs = self.model(_inputs)
+        _targets, outputs, _ = compile_utils.match_dtype_and_rank(_targets, outputs, None)
         residuals = self.loss.residuals(_targets, outputs)
         return tf.reduce_prod(residuals.shape[1::])
 
@@ -683,23 +686,19 @@ class Trainer:
 # ==============================================================================
 
 
-class ModelWrapper(tf.keras.Sequential):
+class ModelWrapper(tf.keras.Model):
     """Wraps a keras model.
 
     When fit is called, the wrapped model is trained using Levenberg–Marquardt.
     """
 
     def __init__(self, model):
-        if not model.built:
-            raise ValueError('This model has not yet been built. '
-                             'Build the model first by calling `build()` or '
-                             'calling `fit()` with some data, or specify an '
-                             '`input_shape` argument in the first layer(s) for '
-                             'automatic build.')
-
-        super(ModelWrapper, self).__init__([model])
+        super(ModelWrapper, self).__init__()
         self.model = model
         self.trainer = None
+
+    def call(self, inputs, training=None, mask=None):
+        return self.model(inputs, training, mask)
 
     def compile(self,
                 optimizer=tf.keras.optimizers.SGD(learning_rate=1.0),
@@ -720,9 +719,11 @@ class ModelWrapper(tf.keras.Sequential):
             loss_weights=loss_weights,
             weighted_metrics=weighted_metrics,
             run_eagerly=True)
+        
+        self.built = self.model.built
 
         self.trainer = Trainer(
-            model=self.model,
+            model=self,
             optimizer=optimizer,
             loss=loss,
             damping_algorithm=damping_algorithm,
