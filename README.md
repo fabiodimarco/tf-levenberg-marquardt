@@ -3,7 +3,7 @@
 
 Implementation of Levenberg-Marquardt training for models that inherits from `tf.keras.Model`. The algorithm has been extended to support **mini-batch** training for both **regression** and **classification** problems.
 
-##### Implemented losses
+### Implemented losses
 * MeanSquaredError
 * ReducedOutputsMeanSquaredError
 * CategoricalCrossentropy
@@ -13,9 +13,10 @@ Implementation of Levenberg-Marquardt training for models that inherits from `tf
 * CategoricalMeanSquaredError
 * Support for custom losses
 
-##### Implemented damping algorithms
-* Standard: <img src="https://render.githubusercontent.com/render/math?math=\J^\T\!\J %2B \lambda \I" align="top" height="19px"/>
-* Fletcher: <img src="https://render.githubusercontent.com/render/math?math=\J^\T\!\J %2B \lambda \diag\!(\J^\T\!\J\!)" align="top" height="23px"/>
+### Implemented damping algorithms
+Implemented damping algorithms
+* Standard: $\large J^T J + \lambda I$
+* Fletcher: $\large J^T J + \lambda ~ \text{diag}(J^T J)$
 * Support for custom damping algorithm
 
 More details on Levenberg-Marquardt can be found on [this page](https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm).
@@ -23,7 +24,7 @@ More details on Levenberg-Marquardt can be found on [this page](https://en.wikip
 # Usage
 Suppose that `model` and `train_dataset` has been created, it is possible to train the model in two different ways.
 
-##### Custom Model.fit
+### Custom Model.fit
 This is similar to the standard way models are trained with keras, the difference is that the fit method is called on a `ModelWrapper` class instead of calling it directly on the `model` class.
 ```python
 import levenberg_marquardt as lm
@@ -38,7 +39,7 @@ model_wrapper.compile(
 model_wrapper.fit(train_dataset, epochs=5)
 ```
 
-##### Custom training loop
+### Custom training loop
 This alternative is less flexible than Model.fit as for example it does not support callbacks and is only trainable using `tf.data.Dataset`.
 ```python
 import levenberg_marquardt as lm
@@ -57,72 +58,72 @@ trainer.fit(
 ## Memory, Speed and Convergence considerations
 In order to achieve the best performances out of the training algorithm some considerations have to be done, so that the batch size and the number of weights of the model are chosen properly. The Levenberg–Marquardt algorithm is used to solve the least squares problem
 
-<p align="center">
-  <img src="https://render.githubusercontent.com/render/math?math=\displaystyle\large \argmin_{W} \sum_{i=1}^{N}  [y_i - f(x_i, W)]^2"/><img align="right" src="https://render.githubusercontent.com/render/math?math=\begin{multline*}\tiny\phantom{1}\\ \large (1)\end{multline*}"/>
-</p>
+$\large (1)$
 
-where 
-<img src="https://render.githubusercontent.com/render/math?math=\begin{multline*} \Large \!\!\! y_i - f(x_i, w) \!\!\! \end{multline*}" align="top" height="27px"/> are the residuals, 
-<img src="https://render.githubusercontent.com/render/math?math=W" align="bottom" height="12px"/> 
-are weights of the model and 
-<img src="https://render.githubusercontent.com/render/math?math=N" align="bottom" height="12px"/> 
-the number of residuals, which can be obtained by multiplying the batch size with the number of outputs of the model.
+$$
+\large \underset{W}{\text{argmin}} \sum_{i=1}^{N} [y_i - f(x_i, W)]^2
+$$
 
-<p align="center">
-  <img src="https://render.githubusercontent.com/render/math?math=\displaystyle\large \num\!\_\residuals = \batch\!\_\size \cdot \num\!\_\outputs"/><img align="right" src="https://render.githubusercontent.com/render/math?math=\large (2)"/>
-</p>
+where $\large y_i - f(x_i, w)$ are the residuals, $\large W$ are weights of the model and $\large N$ the number of residuals, which can be obtained by multiplying the batch size with the number of outputs of the model.
+
+$\large (2)$
+
+$$
+\large \text{num\\_residuals} = \text{batch\\_size} \cdot \text{num\\_outputs}
+$$
 
 The Levenberg–Marquardt updates can be computed using two equivalent formulations
 
-<p align="center">
-  <img src="https://render.githubusercontent.com/render/math?math=\displaystyle\large \updates = (\J^\T\!\J %2B \:\damping\!)^{-1} \J^\T\!\residuals"/><img align="right" src="https://render.githubusercontent.com/render/math?math=\large (3\a\!)"/>
-</p>
+$\large (3\text{a})$
 
-<p align="center">
-  <img src="https://render.githubusercontent.com/render/math?math=\displaystyle\large \updates = \J^\T\!(\J\J^\T\! %2B \damping\!)^{-1} \residuals"/><img align="right" src="https://render.githubusercontent.com/render/math?math=\large (3\b\!)"/>
-</p>
+$$
+\large \text{updates} = (J^T J + \text{damping})^{-1} J^T \text{residuals}
+$$
+
+$\large (3\text{b})$
+
+$$
+\large \text{updates} = J^T (JJ^T  + \text{damping})^{-1} \text{residuals}
+$$
 
 given that the size of the jacobian matrix is **[num_residuals x num_weights]**. 
-In the first equation 
-<img src="https://render.githubusercontent.com/render/math?math=\begin{multline*} \huge \!\!\!(\J^\T\!\J %2B \:\damping\!)\!\!\! \end{multline*}" align="top" height="25px"/> 
-have size **[num_weights x num_weights]**, while in the second equation 
-<img src="https://render.githubusercontent.com/render/math?math=\begin{multline*} \huge \!\!\!(\J\J^\T\! %2B \damping\!)\!\!\! \end{multline*}" align="top" height="25px"/> 
-have size **[num_residuals x num_residuals]**.  
-The first equation is convenient when **num_residuals > num_weights** *overdetermined*, while the second equation is convenient when **num_residuals < num_weights** *underdetermined*. For each batch the algorithm checks whether the problem is *overdetermined* or *underdetermined* and decide the update formula to use.
+In the first equation $\large (J^T J + \text{damping})$ have size **[num_weights x num_weights]**, while in the second equation $\large (JJ^T  + \text{damping})$ have size **[num_residuals x num_residuals]**. The first equation is convenient when **num_residuals > num_weights** *overdetermined*, while the second equation is convenient when **num_residuals < num_weights** *underdetermined*. For each batch the algorithm checks whether the problem is *overdetermined* or *underdetermined* and decide the update formula to use.
 
-##### Splitted jacobian matrix computation
+### Splitted jacobian matrix computation
 Equation 
-<img src="https://render.githubusercontent.com/render/math?math=\begin{multline*} \Large \!\!\!(3\a\!)\!\!\! \end{multline*}" align="top" height="27px"/>, 
-has some additional properties that can be exploited to reduce memory usage and increase speed as well. In fact, it is possible to split the jacobian computation avoiding the storage of the full matrix.
+$\large (3\text{a})$, has some additional properties that can be exploited to reduce memory usage and increase speed as well. In fact, it is possible to split the jacobian computation avoiding the storage of the full matrix.
 This is realized by splitting the batch in smaller sub-batches (of size 100 by default) so that the number of rows (number of residuals) of each jacobian matrix is at most
 
-<p align="center">
-  <img src="https://render.githubusercontent.com/render/math?math=\displaystyle\large \num\!\_\residuals = \sub\!\_\batch\!\_\size \cdot \num\!\_\outputs"/><img align="right" src="https://render.githubusercontent.com/render/math?math=\large (4)"/>
-</p>
+$\large (4)$
+
+$$
+\large \text{num\\_residuals} = \text{sub\\_batch\\_size} \cdot \text{num\\_outputs}
+$$
 
 Equation 
-<img src="https://render.githubusercontent.com/render/math?math=\begin{multline*} \Large \!\!\!(3\a\!)\!\!\! \end{multline*}" align="top" height="27px"/>, 
-can be rewritten as
+$\large (3\text{a})$, can be rewritten as
 
-<p align="center">
-  <img src="https://render.githubusercontent.com/render/math?math=\displaystyle\large \updates = (\J^\T\!\J %2B \:\damping\!)^{-1} \g"/><img align="right" src="https://render.githubusercontent.com/render/math?math=\large (5)"/>
-</p>
+$\large (5)$
 
-where the hessian approximation
-<img src="https://render.githubusercontent.com/render/math?math=\J^\T\!\J\!" align="bottom" height="15px"/> 
-and the gradient 
-<img src="https://render.githubusercontent.com/render/math?math=\begin{multline*}\!\!\!\!\!\!\\\!\!\!\huge\g\!\!\!\!\!\!\!\!\!\end{multline*}" align="top" height="27px"/> 
-are computed without storing the full jacobian matrix as
+$$
+\large \text{updates} = (J^T J + \text{damping})^{-1} g
+$$
 
-<p align="center">
-  <img src="https://render.githubusercontent.com/render/math?math=\displaystyle\large \J^\T\!\J = \sum_{i=1}^{M}  \bar\J_i^\T\!\bar\J_i"/><img align="right" src="https://render.githubusercontent.com/render/math?math=\begin{multline*}\tiny\phantom{1}\\ \large (6\a\!)\end{multline*}"/>
-</p>
+where the hessian approximation $\large J^T J$ and the gradient $\large g$ are computed without storing the full jacobian matrix as
 
-<p align="center">
-  <img src="https://render.githubusercontent.com/render/math?math=\displaystyle\large \g = \sum_{i=1}^{M}  \bar\J_i^\T\!\residuals_i"/><img align="right" src="https://render.githubusercontent.com/render/math?math=\begin{multline*}\tiny\phantom{1}\\ \large (6\b\!)\end{multline*}"/>
-</p>
+$\large (6\text{a})$
 
-##### Conclusions
+$$
+\large J^T J = \sum_{i=1}^{M} \bar{J}_i^T \bar{J}_i
+$$
+
+$\large (6\text{b})$
+
+$$
+\large g = \sum_{i=1}^{M} \bar{J}_i^T ~ \text{residuals}_i
+$$
+
+### Conclusions
 From experiments I usually got better convergence using quite large batch sizes which statistically represent the entire dataset, but more experiments needs to be done with small batches and momentum.
 However, if the model is big the usage of large batch sizes may not be possible. When the problem is *overdetermined*, the size of the linear system to solve at each step might be too large. When the problem is *underdetermined*, the full jacobian matrix might be too large to be stored.
 Possible applications that could benefit from this algorithm are those training only a small number of parameters simultaneously. As for example: fine tuning, composed models and overfitting reduction using small models. In these cases the Levenberg–Marquardt algorithm could converge much faster then first-order methods.
@@ -151,7 +152,7 @@ Epoch 100/100
 20/20 [==============================] - 0s 5ms/step - damping_factor: 1.0000e-07 - attempts: 1.0000 - loss: 1.0265e-08
 Elapsed time:  14.7972407
 ```
-##### Plot results
+### Plot results
 <img src="https://user-images.githubusercontent.com/15234505/97504830-fd83ad80-1977-11eb-9ca1-dd7113b980e3.png" width="400"/>
 
 ## Results on mnist dataset classification
