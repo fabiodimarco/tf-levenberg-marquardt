@@ -19,7 +19,8 @@ y_test = tf.cast(y_test, dtype=tf.float32)
 train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_dataset = train_dataset.shuffle(60000)
 train_dataset = train_dataset.batch(6000).cache()
-train_dataset = train_dataset.prefetch(tf.data.AUTOTUNE)
+train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+
 
 model = keras.models.Sequential(
     [

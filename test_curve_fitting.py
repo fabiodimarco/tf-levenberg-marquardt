@@ -41,6 +41,7 @@ model_wrapper.compile(
     optimizer=keras.optimizers.SGD(learning_rate=1.0), loss=lm.MeanSquaredError()
 )
 
+
 print('Train using Adam')
 t1_start = time.perf_counter()
 model.fit(train_dataset, epochs=1000)
