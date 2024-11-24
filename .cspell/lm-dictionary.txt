@@ -1,0 +1,17 @@
+AUTOTUNE
+backpropagation
+chol
+Crossentropy
+CUDA
+dtypes
+jacobians
+Levenberg
+linalg
+Marquardt
+matplotlib
+numpy
+pfor
+Progbar
+PYTHONPATH
+sinc
+underdetermined

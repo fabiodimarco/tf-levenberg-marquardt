@@ -1,0 +1,11 @@
+name: levenberg_marquardt
+channels:
+  - defaults
+dependencies:
+  - python=3.10.11
+  - numpy
+  - matplotlib
+  - black
+  - pip
+  - pip:
+      - tensorflow[and-cuda]
