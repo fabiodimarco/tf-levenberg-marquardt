@@ -3,6 +3,8 @@
 
 Implementation of Levenberg-Marquardt training for models that inherits from `tf.keras.Model`. The algorithm has been extended to support **mini-batch** training for both **regression** and **classification** problems.
 
+A PyTorch implementation is also available: [torch-levenberg-marquardt](https://github.com/fabiodimarco/torch-levenberg-marquardt)
+
 ### Implemented losses
 * MeanSquaredError
 * ReducedOutputsMeanSquaredError
