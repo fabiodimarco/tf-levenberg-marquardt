@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
-import levenberg_marquardt as lm
+import tf_levenberg_marquardt as lm
 
 input_size = 20000
 batch_size = 1000
@@ -35,10 +35,10 @@ model.compile(
     loss=keras.losses.MeanSquaredError(),
 )
 
-model_wrapper = lm.ModelWrapper(keras.models.clone_model(model))
+model_wrapper = lm.model.ModelWrapper(keras.models.clone_model(model))
 
 model_wrapper.compile(
-    optimizer=keras.optimizers.SGD(learning_rate=1.0), loss=lm.MeanSquaredError()
+    optimizer=keras.optimizers.SGD(learning_rate=1.0), loss=lm.loss.MeanSquaredError()
 )
 
 

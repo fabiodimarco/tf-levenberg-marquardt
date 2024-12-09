@@ -3,7 +3,7 @@ import time
 import keras
 import tensorflow as tf
 
-import levenberg_marquardt as lm
+import tf_levenberg_marquardt as lm
 
 (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
 
@@ -57,11 +57,11 @@ model.compile(
     metrics=['accuracy'],
 )
 
-model_wrapper = lm.ModelWrapper(keras.models.clone_model(model))
+model_wrapper = lm.model.ModelWrapper(keras.models.clone_model(model))
 
 model_wrapper.compile(
     optimizer=keras.optimizers.SGD(learning_rate=0.1),
-    loss=lm.SparseCategoricalCrossentropy(from_logits=True),
+    loss=lm.loss.SparseCategoricalCrossentropy(from_logits=True),
     solve_method='solve',
     metrics=['accuracy'],
 )
