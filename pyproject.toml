@@ -31,9 +31,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "matplotlib>=3.9.3",
-    "numpy>=2.0.2",
-    "tensorflow[and-cuda]>=2.18.0",
+    "numpy>=1.22",
+    "tensorflow>=2.15.0",
 ]
 
 [project.urls]
