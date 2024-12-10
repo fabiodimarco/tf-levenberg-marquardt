@@ -29,13 +29,13 @@ Suppose that `model` and `train_dataset` has been created, it is possible to tra
 ### Custom Model.fit
 This is similar to the standard way models are trained with keras, the difference is that the fit method is called on a `ModelWrapper` class instead of calling it directly on the `model` class.
 ```python
-import levenberg_marquardt as lm
+import tf_levenberg_marquardt as lm
 
-model_wrapper = lm.ModelWrapper(model)
+model_wrapper = lm.model.ModelWrapper(model)
 
 model_wrapper.compile(
     optimizer=tf.keras.optimizers.SGD(learning_rate=0.1),
-    loss=lm.SparseCategoricalCrossentropy(from_logits=True),
+    loss=lm.loss.SparseCategoricalCrossentropy(from_logits=True),
     metrics=['accuracy'])
 
 model_wrapper.fit(train_dataset, epochs=5)
@@ -46,10 +46,10 @@ This alternative is less flexible than Model.fit as for example it does not supp
 ```python
 import levenberg_marquardt as lm
 
-trainer = lm.Trainer(
+trainer = lm.training.Trainer(
     model=model,
     optimizer=tf.keras.optimizers.SGD(learning_rate=0.1),
-    loss=lm.SparseCategoricalCrossentropy(from_logits=True))
+    loss=lm.loss.SparseCategoricalCrossentropy(from_logits=True))
 
 trainer.fit(
     dataset=train_dataset,
