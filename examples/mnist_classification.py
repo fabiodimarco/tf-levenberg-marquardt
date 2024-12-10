@@ -2,7 +2,6 @@ import time
 
 import keras
 import tensorflow as tf
-
 import tf_levenberg_marquardt as lm
 
 (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
@@ -19,7 +18,7 @@ y_test = tf.cast(y_test, dtype=tf.float32)
 train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_dataset = train_dataset.shuffle(60000)
 train_dataset = train_dataset.batch(6000).cache()
-train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+train_dataset = train_dataset.prefetch(tf.data.AUTOTUNE)
 
 
 model = keras.models.Sequential(
@@ -66,7 +65,7 @@ model_wrapper.compile(
     metrics=['accuracy'],
 )
 
-print('Train using Adam')
+print('\nTrain using Adam')
 t1_start = time.perf_counter()
 model.fit(train_dataset, epochs=200)
 t1_stop = time.perf_counter()

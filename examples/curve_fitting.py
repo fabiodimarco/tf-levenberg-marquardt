@@ -41,7 +41,7 @@ model_wrapper.compile(
 )
 
 
-print('Train using Adam')
+print('\nTrain using Adam')
 t1_start = time.perf_counter()
 model.fit(train_dataset, epochs=100)
 t1_stop = time.perf_counter()
