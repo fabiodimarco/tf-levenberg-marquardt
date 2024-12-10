@@ -4,7 +4,6 @@ import keras
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-
 import tf_levenberg_marquardt as lm
 
 input_size = 20000
@@ -18,7 +17,7 @@ y_train = tf.expand_dims(tf.cast(y_train, tf.float32), axis=-1)
 
 train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 train_dataset = train_dataset.shuffle(input_size)
-train_dataset = train_dataset.batch(batch_size).cache()
+train_dataset = train_dataset.batch(batch_size).repeat(10).cache()
 train_dataset = train_dataset.prefetch(tf.data.AUTOTUNE)
 
 model = keras.Sequential(
@@ -44,13 +43,13 @@ model_wrapper.compile(
 
 print('Train using Adam')
 t1_start = time.perf_counter()
-model.fit(train_dataset, epochs=1000)
+model.fit(train_dataset, epochs=100)
 t1_stop = time.perf_counter()
 print('Elapsed time: ', t1_stop - t1_start)
 
 print('\nTrain using Levenberg-Marquardt')
 t2_start = time.perf_counter()
-model_wrapper.fit(train_dataset, epochs=100)
+model_wrapper.fit(train_dataset, epochs=10)
 t2_stop = time.perf_counter()
 print('Elapsed time: ', t2_stop - t2_start)
 
