@@ -4,16 +4,17 @@ from tensorflow import Tensor
 from tensorflow.python.keras.engine import compile_utils, data_adapter
 
 from .damping import DampingAlgorithm
-from .loss import MeanSquaredError, Loss
+from .loss import Loss, MeanSquaredError
+
 
 class Trainer:
-    """Levenberg–Marquardt training algorithm."""
+    """Levenberg-Marquardt training algorithm."""
 
     def __init__(
         self,
         model: keras.Model,
         optimizer=keras.optimizers.SGD(learning_rate=1.0),
-        loss: Loss=MeanSquaredError(),
+        loss: Loss = MeanSquaredError(),
         damping_algorithm=DampingAlgorithm(),
         attempts_per_step: int = 10,
         solve_method: str = 'qr',
@@ -444,4 +445,3 @@ class Trainer:
             pl.on_epoch_end(epoch)
 
         pl.on_train_end()
-

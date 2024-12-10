@@ -58,7 +58,7 @@ trainer.fit(
 ```
 
 ## Memory, Speed and Convergence considerations
-In order to achieve the best performances out of the training algorithm some considerations have to be done, so that the batch size and the number of weights of the model are chosen properly. The Levenberg–Marquardt algorithm is used to solve the least squares problem
+In order to achieve the best performances out of the training algorithm some considerations have to be done, so that the batch size and the number of weights of the model are chosen properly. The Levenberg-Marquardt algorithm is used to solve the least squares problem
 
 $\large (1)$
 
@@ -74,7 +74,7 @@ $$
 \large \text{num\\_residuals} = \text{batch\\_size} \cdot \text{num\\_outputs}
 $$
 
-The Levenberg–Marquardt updates can be computed using two equivalent formulations
+The Levenberg-Marquardt updates can be computed using two equivalent formulations
 
 $\large (3\text{a})$
 
@@ -88,11 +88,11 @@ $$
 \large \text{updates} = J^T (JJ^T  + \text{damping})^{-1} \text{residuals}
 $$
 
-given that the size of the jacobian matrix is **[num_residuals x num_weights]**. 
+given that the size of the jacobian matrix is **[num_residuals x num_weights]**.
 In the first equation $\large (J^T J + \text{damping})$ have size **[num_weights x num_weights]**, while in the second equation $\large (JJ^T  + \text{damping})$ have size **[num_residuals x num_residuals]**. The first equation is convenient when **num_residuals > num_weights** *overdetermined*, while the second equation is convenient when **num_residuals < num_weights** *underdetermined*. For each batch the algorithm checks whether the problem is *overdetermined* or *underdetermined* and decide the update formula to use.
 
 ### Splitted jacobian matrix computation
-Equation 
+Equation
 $\large (3\text{a})$, has some additional properties that can be exploited to reduce memory usage and increase speed as well. In fact, it is possible to split the jacobian computation avoiding the storage of the full matrix.
 This is realized by splitting the batch in smaller sub-batches (of size 100 by default) so that the number of rows (number of residuals) of each jacobian matrix is at most
 
@@ -102,7 +102,7 @@ $$
 \large \text{num\\_residuals} = \text{sub\\_batch\\_size} \cdot \text{num\\_outputs}
 $$
 
-Equation 
+Equation
 $\large (3\text{a})$, can be rewritten as
 
 $\large (5)$
@@ -128,11 +128,11 @@ $$
 ### Conclusions
 From experiments I usually got better convergence using quite large batch sizes which statistically represent the entire dataset, but more experiments needs to be done with small batches and momentum.
 However, if the model is big the usage of large batch sizes may not be possible. When the problem is *overdetermined*, the size of the linear system to solve at each step might be too large. When the problem is *underdetermined*, the full jacobian matrix might be too large to be stored.
-Possible applications that could benefit from this algorithm are those training only a small number of parameters simultaneously. As for example: fine tuning, composed models and overfitting reduction using small models. In these cases the Levenberg–Marquardt algorithm could converge much faster then first-order methods.
+Possible applications that could benefit from this algorithm are those training only a small number of parameters simultaneously. As for example: fine tuning, composed models and overfitting reduction using small models. In these cases the Levenberg-Marquardt algorithm could converge much faster then first-order methods.
 
 ## Results on curve fitting
 Simple curve fitting test implemented in `test_curve_fitting.py` and [Colab](https://colab.research.google.com/github/fabiodimarco/tf-levenberg-marquardt/blob/main/tf-levenberg-marquardt.ipynb). The function `y = sinc(10 * x)` is fitted using a Shallow Neural Network with 61 parameters.
-Despite the triviality of the problem, first-order methods such as Adam fail to converge, while Levenberg–Marquardt converges rapidly with very low loss values. The values of learning_rate were chosen experimentally on the basis of the results obtained by each algorithm.
+Despite the triviality of the problem, first-order methods such as Adam fail to converge, while Levenberg-Marquardt converges rapidly with very low loss values. The values of learning_rate were chosen experimentally on the basis of the results obtained by each algorithm.
 
 Here the results with Adam for 10000 epochs and learning_rate=0.01
 ```
@@ -144,7 +144,7 @@ Epoch 10000/10000
 20/20 [==============================] - 0s 449us/step - loss: 6.5928e-04
 Elapsed time:  157.10102080000001
 ```
-Here the results with Levenberg–Marquardt for 100 epochs and learning_rate=1.0
+Here the results with Levenberg-Marquardt for 100 epochs and learning_rate=1.0
 ```
 Train using Levenberg-Marquardt
 Epoch 1/100
@@ -159,7 +159,7 @@ Elapsed time:  14.7972407
 
 ## Results on mnist dataset classification
 Common mnist classification test implemented in `test_mnist_classification.py` and [Colab](https://colab.research.google.com/github/fabiodimarco/tf-levenberg-marquardt/blob/main/tf-levenberg-marquardt.ipynb). The classification is performed using a Convolutional Neural Network with 1026 parameters.
-This time there were no particular benefits as in the previous case. Even if Levenberg–Marquardt converges with far fewer epochs than Adam, the longer execution time per step nullifies its advantages.
+This time there were no particular benefits as in the previous case. Even if Levenberg-Marquardt converges with far fewer epochs than Adam, the longer execution time per step nullifies its advantages.
 However, both methods achieve roughly the same accuracy values on train and test set.
 
 Here the results with Adam for 300 epochs and learning_rate=0.01
@@ -174,7 +174,7 @@ Elapsed time:  58.071762045000014
 
 test_loss: 0.072342 - test_accuracy: 0.977100
 ```
-Here the results with Levenberg–Marquardt for 10 epochs and learning_rate=0.1
+Here the results with Levenberg-Marquardt for 10 epochs and learning_rate=0.1
 ```
 Train using Levenberg-Marquardt
 Epoch 1/10

@@ -1,16 +1,16 @@
 import keras
 from tensorflow import Tensor
-
 from tensorflow.python.keras.engine import data_adapter
 
 from .damping import DampingAlgorithm
 from .loss import MeanSquaredError
 from .training import Trainer
 
+
 class ModelWrapper(keras.Model):
     """Wraps a keras model.
 
-    When fit is called, the wrapped model is trained using Levenberg–Marquardt.
+    When fit is called, the wrapped model is trained using Levenberg-Marquardt.
     """
 
     def __init__(self, model: keras.Model):
@@ -27,7 +27,7 @@ class ModelWrapper(keras.Model):
     def compile(
         self,
         optimizer=keras.optimizers.SGD(learning_rate=1.0),
-        loss: keras.Loss=MeanSquaredError(),
+        loss: keras.Loss = MeanSquaredError(),
         damping_algorithm=DampingAlgorithm(),
         attempts_per_step: int = 10,
         solve_method: str = 'qr',
@@ -76,8 +76,6 @@ class ModelWrapper(keras.Model):
             'loss': loss.numpy().item(),
         }
 
-        # self.compiled_metrics.update_state(y, y_pred)
-        # self._validate_target_and_loss(y, loss)
         metrics = self.compute_metrics(x, y, y_pred, sample_weight)
 
         if 'loss' in metrics:

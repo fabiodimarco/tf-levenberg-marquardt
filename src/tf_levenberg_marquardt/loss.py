@@ -1,8 +1,9 @@
+from abc import ABC, abstractmethod
+
 import keras
 import tensorflow as tf
 from tensorflow import Tensor
 
-from abc import ABC, abstractmethod
 
 class Loss(keras.losses.Loss, ABC):
     """Base class for all loss functions using ABC."""
@@ -11,6 +12,7 @@ class Loss(keras.losses.Loss, ABC):
     def residuals(self, y_true: Tensor, y_pred: Tensor) -> Tensor:
         """Computes the residuals between `y_true` and `y_pred`."""
         pass
+
 
 class MeanSquaredError(keras.losses.MeanSquaredError, Loss):
     """Provides mean squared error metrics: loss / residuals.
@@ -192,5 +194,3 @@ class CategoricalMeanSquaredError(Loss):
         # Selects the y_pred which corresponds to y_true equal to 1.
         prediction = tf.reduce_sum(tf.math.multiply(y_true, y_pred), axis=1)
         return 1.0 - prediction
-
-

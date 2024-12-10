@@ -37,6 +37,6 @@ dependencies = [
 ]
 
 [project.urls]
-"Home-page" = "https://github.com/fabiodimarco/torch-levenberg-marquardt"
-"Bug Reports" = "https://github.com/fabiodimarco/torch-levenberg-marquardt/issues"
-"Source" = "https://github.com/fabiodimarco/torch-levenberg-marquardt/"
+"Home-page" = "https://github.com/fabiodimarco/tf-levenberg-marquardt"
+"Bug Reports" = "https://github.com/fabiodimarco/tf-levenberg-marquardt/issues"
+"Source" = "https://github.com/fabiodimarco/tf-levenberg-marquardt/"

@@ -1,8 +1,9 @@
 import tensorflow as tf
 from tensorflow import Tensor
 
+
 class DampingAlgorithm:
-    """Default Levenberg–Marquardt damping algorithm.
+    """Default Levenberg-Marquardt damping algorithm.
 
     This is used inside the Trainer as a generic class. Many damping algorithms can be
     implemented using the same interface.

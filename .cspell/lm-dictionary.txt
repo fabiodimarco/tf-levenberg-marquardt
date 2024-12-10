@@ -1,12 +1,16 @@
 AUTOTUNE
 backpropagation
 chol
+Colab
 Crossentropy
 CUDA
 dtypes
+Fabio
 jacobians
+keras
 Levenberg
 linalg
+logits
 Marquardt
 matplotlib
 numpy
