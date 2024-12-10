@@ -71,9 +71,9 @@ class ModelWrapper(keras.Model):
         loss, y_pred, attempts, stop_training = self.trainer.train_step(x, y)
 
         logs = {
-            'damping_factor': self.trainer.damping_factor,
+            'damping_factor': self.trainer.damping_factor.numpy().item(),
             'attempts': attempts,
-            'loss': loss,
+            'loss': loss.numpy().item(),
         }
 
         # self.compiled_metrics.update_state(y, y_pred)
