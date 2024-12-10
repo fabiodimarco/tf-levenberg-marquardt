@@ -1,5 +1,5 @@
 # Tensorflow Levenberg-Marquardt
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fabiodimarco/tf-levenberg-marquardt/blob/main/tf-levenberg-marquardt.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fabiodimarco/tf-levenberg-marquardt/blob/main/examples/tf_levenberg_marquardt.ipynb)
 
 Implementation of Levenberg-Marquardt training for models that inherits from `tf.keras.Model`. The algorithm has been extended to support **mini-batch** training for both **regression** and **classification** problems.
 
