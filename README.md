@@ -1,4 +1,6 @@
 # Tensorflow Levenberg-Marquardt
+
+[![PyPI](https://img.shields.io/pypi/v/tf-levenberg-marquardt)](https://pypi.org/project/tf-levenberg-marquardt/)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fabiodimarco/tf-levenberg-marquardt/blob/main/examples/tf_levenberg_marquardt.ipynb)
 
 Implementation of Levenberg-Marquardt training for models that inherits from `tf.keras.Model`. The algorithm has been extended to support **mini-batch** training for both **regression** and **classification** problems.
@@ -22,6 +24,21 @@ Implemented damping algorithms
 * Support for custom damping algorithm
 
 More details on Levenberg-Marquardt can be found on [this page](https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm).
+
+## Installation
+
+To install the library, use pip:
+```bash
+pip install tf-levenberg-marquardt
+```
+
+## Development Setup
+
+To contribute or modify the code, clone the repository and install it in editable mode:
+
+```bash
+conda env create -f environment.yml
+```
 
 # Usage
 Suppose that `model` and `train_dataset` has been created, it is possible to train the model in two different ways.
