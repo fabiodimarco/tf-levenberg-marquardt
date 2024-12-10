@@ -1,6 +1,6 @@
 [project]
 name = "tf-levenberg-marquardt"
-version = "0.1.0"
+version = "1.0.0"
 description = "Tensorflow implementation of Levenberg-Marquardt training algorithm"
 readme = "README.md"
 requires-python = ">=3.10"
