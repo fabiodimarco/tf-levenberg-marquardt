@@ -204,5 +204,5 @@ Elapsed time:  54.859995966999975
 test_loss: 0.072407 - test_accuracy: 0.977800
 ```
 ## Requirements
- * Tensorflow 2.18.0
- * Matplotlib to visualize curve fitting results
+ * numpy>=1.22
+ * tensorflow>=2.15.0
