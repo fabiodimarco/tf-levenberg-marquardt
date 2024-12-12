@@ -1,6 +1,8 @@
 # Tensorflow Levenberg-Marquardt
 
 [![PyPI](https://img.shields.io/pypi/v/tf-levenberg-marquardt)](https://pypi.org/project/tf-levenberg-marquardt/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/tf-levenberg-marquardt?label=PyPI%20downloads)](https://pypi.org/project/tf-levenberg-marquardt/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fabiodimarco/tf-levenberg-marquardt/blob/main/examples/tf_levenberg_marquardt.ipynb)
 
 Implementation of Levenberg-Marquardt training for models that inherits from `tf.keras.Model`. The algorithm has been extended to support **mini-batch** training for both **regression** and **classification** problems.
